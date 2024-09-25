@@ -1,25 +1,33 @@
 import wollok.game.*
 
 object manzana {
-	const base= 5
-	var madurez = 1
-	
-	method energiaQueOtorga() {
-		return base * madurez	
-	}
-	
-	method madurar() {
-		madurez = madurez + 1
-		//madurez += 1
-	}
+	const property esSolido = false
+    method position() {
+        return game.at(1,1)
+    }
 
+    method image() {
+        return "manzana.png"
+    }
+
+	method energiaQueOtorga() {
+		return 30
+	}
 }
 
 object alpiste {
+	const property esSolido = false
+    method position() {
+        return game.at(6,6)
+    }
+
+    method image() {
+        return "alpiste.png"
+    }
 
 	method energiaQueOtorga() {
 		return 20
-	} 
-
+	}
 }
 
+//falta la energia que otorga

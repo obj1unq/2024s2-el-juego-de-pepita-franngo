@@ -1,14 +1,126 @@
 import wollok.game.*
 import pepita.*
+import posiciones.*
+import extras.*
+import comidas.*
 
 program pepitaGame {
-	game.title("Pepita") 	//Valor por defecto "Wollok Game"
+	game.title("Pepita Strikes Back") 	//Valor por defecto "Wollok Game"
 	game.height(10) 		//valor por defecto 5
 	game.width(10) 			//valor por defecto 5
-	game.cellSize(50) 		//valor por defecto 50
+	game.cellSize(50) 		//valor por defecto 50 (pero es preferible 64)
 	//search assets in assets folder, for example, for the background
-	//Valor por defecto game.ground("ground.png")
+	//game.boardGround("fondo1.jpg")
+	game.addVisual(fondo)
+	game.addVisual(muro)
+	game.addVisual(reloj)
+	game.addVisual(silvestre)
+	game.addVisual(nido)
+	game.addVisual(manzana)
+	game.addVisual(alpiste)
+	game.addVisual(pepita)
+
+	//keyboard.w().whilePressRepeat({pepita.mover(arriba)},200) aparentemente
+	//no funciona. Asumo que no lo migraron desde la vieja versión de wollok.
+	//keyboard.w().whenKeyPressedDo({pepita.mover(arriba)}) esto es un
+	//renombre de onPressDo()
+	//keyboard.w().onPressDo({pepita.mover(arriba)})
+	//keyboard.d().onPressDo({pepita.mover(derecha)})
+	//keyboard.s().onPressDo({pepita.mover(abajo)})
+	//keyboard.a().onPressDo({pepita.mover(izquierda)})
+	keyboard.w().onPressDo({
+		if(!pepita.isMoving()) { //si pepita está quieta
+			game.onTick(500, "pepitaMoving", {pepita.mover(arriba)})
+			pepita.isMoving(true)
+		} else { //si pepita se está moviendo
+			game.removeTickEvent("pepitaMoving")
+			pepita.isMoving(false)
+		} 
+	})
+	keyboard.d().onPressDo({
+		if(!pepita.isMoving()) { //si pepita está quieta
+			game.onTick(500, "pepitaMoving", {pepita.mover(derecha)})
+			pepita.isMoving(true)
+		} else { //si pepita se está moviendo
+			game.removeTickEvent("pepitaMoving")
+			pepita.isMoving(false)
+		} 
+	})
+	keyboard.s().onPressDo({
+		if(!pepita.isMoving()) { //si pepita está quieta
+			game.onTick(500, "pepitaMoving", {pepita.mover(abajo)})
+			pepita.isMoving(true)
+		} else { //si pepita se está moviendo
+			game.removeTickEvent("pepitaMoving")
+			pepita.isMoving(false) 
+		} 
+	})
+	keyboard.a().onPressDo({
+		if(!pepita.isMoving()) { //si pepita está quieta
+			game.onTick(500, "pepitaMoving", {pepita.mover(izquierda)})
+			pepita.isMoving(true)
+		} else { //si pepita se está moviendo
+			game.removeTickEvent("pepitaMoving")
+			pepita.isMoving(false) 
+		} 
+	})
+
+	keyboard.k().onPressDo({pepita.comerAhi()})
+
+	//game.uniqueCollider(self) retorna el objeto con el que está colisionando self QUE TIENE QUE SER UNO SOLO
+	//(explota si se ejecuta cuando el personaje no está colisionando con nada)
+	//game.colliders(self) te retorna todos los objetos con los que está colisionando self
+
+	//recomendación: si mandás a hacer algo, está feo que el código sea "si puedo hacer x, lo hago. Sino, no pasa nada". 
+	//Debería ROMPER si no puede hacer ese algo (excepción)
+
+	keyboard.f().onPressDo({fondo.cambiar()})
+
+	//game.onTick(5000, "cambiarFondo", {fondo.cambiar()}) //esto va a hacer que el fondo cambie cada 5 segundos
+
+	//game.onTick(1000, "ejecutarGravedad", {pepita.caer()})
+
+	game.onTick(1000, "cambiarReloj", {reloj.tick()}) //1000 xq el reloj cuenta de a un segundo
+
+	//esto es relativo a lo visto en tutorial 3:
+
+	//diferencia on y whenCollideDo: el on solo ejecuta una vez al colisionar con algo. el when ejecuta muchas veces hasta que se deje
+	//de colisionar con eso
+
+	//game.onCollideDo (pepita, {cosa => cosa.colisiono(pepita)}) //ahí tenés a los 2 objetos que colisionan
+	//todos los objetos tienen que entender colisiono. los que son comida, llevan a cabo efecto de ser comidos pero ahora con
+	//colisión en vez de apretando k. Si no son comida, no pasa nada.
+
+	//con este enfoque, implementamos que el estado va a cambiar cuando se colisiona con cosas y no cuando está en x lado
+	//no se calcula más el estado con un método
+	//ahora es un var property estado = viva 
+	//por tanto, no se usan más los métodos estaAtrapada() y estaEnDestino()
+	//todo lo que tenga que ver con el estado en sí va a ir cambiando a medida que colisionemos con cosas
+	//vamos a configurar que cuando colisionemos con el nido cambie el estado, cuando colisionemos con silvestre lo mismo
+	//cuando colisionemos con comida la tenemos que comer (tomar su energia y remover su visual)
+	//en las comidas
+	//method colisiono(personaje) {
+	//pepita.comerVisual(self)
+	//}
+	//method comerVisual(comida) {
+	//	pepita.comer(comida)
+	//	game.removeVisual(comida)
+	//}
 	
-	//game.addVisual(pepita)
-	game.start()	
+	//métodos de pepita: ganar() { game.schedule(1000, game.stop()) estado=victoriosa } 
+					   //perder() { game.schedule(1000, game.stop()) estado=muerta }
+	//o sea, ante distintos eventos te cambian el estado (el volar y que te queden sin energía entiendo que tmb)
+
+	//ambas formas de obtener el estado son válidas
+	//podeś recordarlo o calcularlo
+	//se puede combinar estas formas para los diferentes objetos según convenga para cada uno
+	//PERO, para un mismo objeto, se debe mantener concordancia sobre la forma de averiguar el estado, que debe ser consistente
+
+	//pensar si es un estado que necesitás ir modificándolo según colisionas con objetos por el mapa
+	//O
+	//si es es un estado que conviene que sea calculado con un método estado y métodos condición booleana
+	
+	game.start()
+
+	//mensaje para terminar el juego es game.stop()
 }
