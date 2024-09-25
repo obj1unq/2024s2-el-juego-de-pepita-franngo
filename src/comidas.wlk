@@ -2,6 +2,11 @@ import wollok.game.*
 
 object manzana {
 	const property esSolido = false
+
+    method colisiono(personaje) {
+        personaje.comerVisual(self)
+    }
+    
     method position() {
         return game.at(1,1)
     }
@@ -17,6 +22,11 @@ object manzana {
 
 object alpiste {
 	const property esSolido = false
+
+    method colisiono(personaje) {
+        personaje.comerVisual(self)
+    }
+
     method position() {
         return game.at(6,6)
     }

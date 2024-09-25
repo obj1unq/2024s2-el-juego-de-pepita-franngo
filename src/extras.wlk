@@ -4,6 +4,10 @@ import pepita.*
 object silvestre {
     const property esSolido = false
 
+    method colisiono(personaje) { 
+        personaje.perder()
+    }
+
     //para silvestre, pepita no es pepita, sino que es simplemente una
     //presa. Es const porque la referencia es constante (no se la va
     //a cambiar por una referencia a otra cosa)
@@ -23,6 +27,10 @@ object silvestre {
 
 object nido {
     const property esSolido = false
+
+    method colisiono(personaje) { 
+        personaje.ganar()
+    }
 
     method position() {
         return game.at(7,8)
@@ -55,6 +63,8 @@ object tablero {
 
 object fondo {
     var escenario = 0
+
+    method colisiono(personaje) { }
     
     method esSolido() {
         return false
@@ -96,6 +106,8 @@ object fondo {
 object muro {
     const property esSolido = true
 
+    //method colisiono(personaje) { } //nunca se llega a colisionar con el muro, así que es innecesario
+
     method position() {
         return game.at(3,3)
     }
@@ -110,6 +122,7 @@ object reloj {
     const property esSolido = false
     var segundos = 0
     
+    method colisiono(personaje) { }
 
     method position() {
         return game.at(9,9)

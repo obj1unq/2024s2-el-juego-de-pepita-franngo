@@ -5,10 +5,11 @@ import extras.*
 object pepita {
 
 	var property isMoving = true //flag
-	var property energia = 250
+	var property energia = 100
 	var position = game.at(2,7);
 	//lo ponemos como atributo porque tenemos que inicializarlo en una cierta celda!
-	const cazador = silvestre
+	//const cazador = silvestre //deja de usarse
+	var property estado = viva
 	
 	method position() {
 		return position
@@ -30,11 +31,13 @@ object pepita {
 		energia = energia + comida.energiaQueOtorga()
 	}
 
+	/*
 	method comerAhi() {
 		const comida = game.uniqueCollider(self) //si no hay un objeto con el que se está colisionando en ese momento, explota
 		self.comer(comida)
 		game.removeVisual(comida)
 	}
+	*/
 
 	method mover(direccion) {
 		self.validarMoverEnEstaDireccion(direccion) //como puede explotar, se ejecuta primero para evitar modificar el estado
@@ -42,8 +45,12 @@ object pepita {
 					  //directamente comprobarFinDeJuego() se encarga de terminar el juego. aunque sí explota si tenés energía insuficiente
 					  //sin haberte movido una primera vez (ponele, empezas con 5 de energía)
 		position = direccion.siguiente(position)
-		self.estado().comprobarFinDeJuego(self) //si estás en una situación de fin de juego (ganaste o perdiste), lo termina
+		//self.estado().comprobarFinDeJuego(self) //si estás en una situación de fin de juego (ganaste o perdiste), lo termina
 												//tmb si no tenés energía suficiente para volar una próxima vez
+												//NO VA MÁS porque esas situaciones ya se disparan al chocar con cosas excepto por 
+		if(!self.puedeVolar(1)) { 				//la situación de energía insuficiente, la cual la vamos a disparar mediante un if
+			self.perder()						//(se podría hacer subtarea)
+		}
 	}
 
 	method validarMoverEnEstaDireccion(direccion) {
@@ -51,6 +58,8 @@ object pepita {
 										  //sin embargo, es casi imposible que pase porque el comprobarFinDeJuego() termina el juego
 										  //altoke al llegar a esas situaciones antes de que puedas intentar moverte de nuevo
 										  //(y es directamente imposible con mi implementación del movimiento de pepita)
+										  //(ahora, en vez del comprobar, es el método que se dispara cuando se cambia de estado, o sea
+										  //ganar() / perder() )
 		const posSiguiente = direccion.siguiente(position)
 		tablero.validarDentro(posSiguiente) //si la posición a la que te vas a mover se sale de los límites, no te deja moverte
 		self.validarAtravesable(posSiguiente) //ahora tmb hay que validar que, a donde querés ir, no se una zona imposible de atravesar
@@ -81,6 +90,7 @@ object pepita {
 		return energia >= self.energiaGastadaAlVolar(kms)
 	}
 
+	/* todo esto SE VA
 	method estado() {
 		return if (self.estaEnNido()) {
 			return victoriosa
@@ -102,6 +112,7 @@ object pepita {
 	method estaAtrapada() {
 		return position==cazador.position()
 	}
+	*/ 
 
 	//otra forma de hacerlo es tener atributo que te dice en qué estado está el pj porque no siempre es fácil calcularlo
 	//este cambiaría cuando suceden cierto eventos, como la colisión con x o y objeto
@@ -123,6 +134,23 @@ object pepita {
 		position = game.at(self.position().x(), self.position().y()-1)
 	}
 
+	method comerVisual(comida) {
+		self.comer(comida)
+		game.removeVisual(comida)
+	}
+
+	method ganar() {
+		estado = victoriosa
+		game.say(self, "Gané")
+		game.schedule(100, {game.stop()})
+	}
+
+	method perder() {
+		estado = muerta
+		game.say(self, "Perdí")
+		game.schedule(100, {game.stop()})
+	}
+
 }
 
 //estados
@@ -130,25 +158,37 @@ object pepita {
 object viva {
 	const property puedeMover = true
 
+	/*
 	method comprobarFinDeJuego(personaje) { }
+	*/
+
+	//fondo() { return 1 } //si quisiéramos que el fondo cambie en base al estado de pepita
 }
 
 object muerta {
 	const property puedeMover = false
 
+	/*
 	method comprobarFinDeJuego(personaje) {
 		game.say(personaje, "Perdí")
 		game.schedule(50, {game.stop()})
 	}
+	*/
+
+	//fondo() { return 0 } //si quisiéramos que el fondo cambie en base al estado de pepita
 }
 
 object victoriosa {
 	const property puedeMover = false
 
+	/*
 	method comprobarFinDeJuego(personaje) {
 		game.say(personaje, "Gané")
 		game.schedule(50, {game.stop()})
 	}
+	*/
+
+	//fondo() { return 0 } //si quisiéramos que el fondo cambie en base al estado de pepita
 }
 
 //podés hacer cosas como que, según el estado en el que estás, el comportamiento de tu personaje va a variar 

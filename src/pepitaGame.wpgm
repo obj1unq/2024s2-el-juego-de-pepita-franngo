@@ -65,7 +65,9 @@ program pepitaGame {
 		} 
 	})
 
-	keyboard.k().onPressDo({pepita.comerAhi()})
+	//keyboard.k().onPressDo({pepita.comerAhi()}) //como ahora se come la comida simplemente colisionando con ella, esto ni siquiera se
+	//puede continuar usando, porque apenas colisionás con la comida ya te la comiste (y, además, no tiene sentido que estén ambas cosas
+	//a la vez)
 
 	//game.uniqueCollider(self) retorna el objeto con el que está colisionando self QUE TIENE QUE SER UNO SOLO
 	//(explota si se ejecuta cuando el personaje no está colisionando con nada)
@@ -81,6 +83,10 @@ program pepitaGame {
 	//game.onTick(1000, "ejecutarGravedad", {pepita.caer()})
 
 	game.onTick(1000, "cambiarReloj", {reloj.tick()}) //1000 xq el reloj cuenta de a un segundo
+
+	game.onCollideDo(pepita, {cosa => cosa.colisiono(pepita)})
+	//para todas las cosas con las que pepita pueda colisionar (o sea, las que tengan una posición en el tablero) se debe hacer que
+	//entiendan el mensaje colisiono
 
 	//esto es relativo a lo visto en tutorial 3:
 
