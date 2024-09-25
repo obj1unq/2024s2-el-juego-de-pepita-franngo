@@ -11,7 +11,7 @@ object manzana {
     }
 
 	method energiaQueOtorga() {
-		return 30
+		return 5
 	}
 }
 

@@ -5,7 +5,7 @@ import extras.*
 object pepita {
 
 	var property isMoving = true //flag
-	var energia = 250
+	var property energia = 250
 	var position = game.at(2,7);
 	//lo ponemos como atributo porque tenemos que inicializarlo en una cierta celda!
 	const cazador = silvestre
@@ -79,10 +79,6 @@ object pepita {
 
 	method puedeVolar(kms) { //método booleano QUE NO ES LO MISMO que la validación
 		return energia >= self.energiaGastadaAlVolar(kms)
-	}
-
-	method energia() {
-		return energia
 	}
 
 	method estado() {
